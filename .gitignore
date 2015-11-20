@@ -1,0 +1,6 @@
+*.suo
+*.user
+bin
+debug
+packages
+*.DotSettings
