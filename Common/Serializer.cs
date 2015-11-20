@@ -2,7 +2,7 @@
 using System.Text;
 using Newtonsoft.Json;
 
-namespace RabbitMQSample
+namespace Common
 {
     public class Serializer<T>
     {

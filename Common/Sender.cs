@@ -1,7 +1,7 @@
 ﻿using System;
 using RabbitMQ.Client;
 
-namespace RabbitMQSample
+namespace Common
 {
     public class Sender<TMessage> where TMessage : new()
     {

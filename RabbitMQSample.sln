@@ -1,7 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQSample", "RabbitMQSample\RabbitMQSample.csproj", "{58D0F6ED-7251-44A9-827D-AD2D77D9E08D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sender", "Sender\Sender.csproj", "{58D0F6ED-7251-44A9-827D-AD2D77D9E08D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Receiver", "Receiver\Receiver.csproj", "{3BADB357-27B5-4608-959B-03D9722D99F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{6AB4B9FA-2A87-4C73-997E-729C367BCE77}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +17,14 @@ Global
 		{58D0F6ED-7251-44A9-827D-AD2D77D9E08D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58D0F6ED-7251-44A9-827D-AD2D77D9E08D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58D0F6ED-7251-44A9-827D-AD2D77D9E08D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BADB357-27B5-4608-959B-03D9722D99F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BADB357-27B5-4608-959B-03D9722D99F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BADB357-27B5-4608-959B-03D9722D99F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BADB357-27B5-4608-959B-03D9722D99F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AB4B9FA-2A87-4C73-997E-729C367BCE77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AB4B9FA-2A87-4C73-997E-729C367BCE77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AB4B9FA-2A87-4C73-997E-729C367BCE77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AB4B9FA-2A87-4C73-997E-729C367BCE77}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

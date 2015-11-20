@@ -2,7 +2,7 @@
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace RabbitMQSample
+namespace Common
 {
     public class Receiver<TMessage> : IDisposable
         where TMessage : new()
@@ -31,7 +31,7 @@ namespace RabbitMQSample
             consumer = new EventingBasicConsumer(channel);
             consumer.Received += consumer_Received;
             channel.BasicConsume(queue: queue,
-                                 noAck: true,
+                                 noAck: false,
                                  consumer: consumer);
         }
 
@@ -60,6 +60,10 @@ namespace RabbitMQSample
         {
             TMessage message = new Serializer<TMessage>().Desearalize(e.Body);
             messageReceivedAction(message);
+            if (channel != null)
+            {
+                channel.BasicAck(e.DeliveryTag, false);
+            }
         }
     }
 }
