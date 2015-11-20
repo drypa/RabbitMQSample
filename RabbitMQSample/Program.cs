@@ -1,10 +1,37 @@
 ﻿using System;
+using System.Threading;
 
 namespace RabbitMQSample
 {
     class Program
     {
         static void Main(string[] args)
+        {
+
+
+
+
+            CancellationTokenSource source = new CancellationTokenSource();
+
+            Thread sendThread = new Thread(Send);
+            sendThread.Start(source.Token);
+
+            //Даём набраться сообщениям в очереди
+            Thread.Sleep(60000);
+            using (Receiver<Message> receiver = new Receiver<Message>("localhost", "message_queue", (msg) => Console.WriteLine(msg.ToString())))
+            {
+                receiver.Open();
+
+                Console.ReadLine();
+
+                source.Cancel(false);
+
+                Console.ReadLine();
+            }
+
+        }
+
+        private static void Send(object startParam)
         {
             Message message = new Message
             {
@@ -14,17 +41,13 @@ namespace RabbitMQSample
             };
 
             Sender<Message> sender = new Sender<Message>("localhost", "message_queue");
-            sender.Send(message);
-
-            using (Receiver<Message> receiver = new Receiver<Message>("localhost", "message_queue", (msg) => Console.WriteLine(msg.ToString())))
+            CancellationToken token = (CancellationToken)startParam;
+            while (!token.IsCancellationRequested)
             {
-                receiver.Open();
-                Console.ReadLine();
+                sender.Send(message);
             }
-
-
-            Console.ReadLine();
         }
+
 
     }
 }
