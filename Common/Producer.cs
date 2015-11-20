@@ -3,13 +3,13 @@ using RabbitMQ.Client;
 
 namespace Common
 {
-    public class Sender<TMessage>
+    public class Producer<TMessage>
         where TMessage : new()
     {
         private readonly string hostName;
         private readonly string queue;
 
-        public Sender(string serverName, string queueName)
+        public Producer(string serverName, string queueName)
         {
             hostName = serverName;
             queue = queueName;

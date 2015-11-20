@@ -4,7 +4,7 @@ using RabbitMQ.Client.Events;
 
 namespace Common
 {
-    public class Receiver<TMessage> : IDisposable
+    public class Consumer<TMessage> : IDisposable
         where TMessage : new()
     {
         private readonly string HostName;
@@ -14,7 +14,7 @@ namespace Common
         private IConnection connection;
         private EventingBasicConsumer consumer;
 
-        public Receiver(string serverName, string queueName, Action<TMessage> onMessageReceived)
+        public Consumer(string serverName, string queueName, Action<TMessage> onMessageReceived)
         {
             HostName = serverName;
             queue = queueName;
@@ -29,9 +29,9 @@ namespace Common
             ConfigureChanel(model);
 
             consumer = new EventingBasicConsumer(model);
-
-            consumer.Received += (sender, args) => ItemProcessing(args);
-            model.BasicQos(0, 2, true);
+            
+            consumer.Received+= (sender, args) => ItemProcessing(args);
+            model.BasicQos(0,2,true);
             model.BasicConsume(queue: queue, noAck: false, consumer: consumer);
 
         }
@@ -50,8 +50,8 @@ namespace Common
 
         private void ConfigureChanel(IModel chanel)
         {
-
-            chanel.QueueDeclare(queue, true, false, autoDelete: false, arguments: null);
+            
+            chanel.QueueDeclare(queue,  true, false, autoDelete: false, arguments: null);
         }
 
         private void ItemProcessing(BasicDeliverEventArgs e)

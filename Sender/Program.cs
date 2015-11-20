@@ -35,7 +35,7 @@ namespace Sender
                 Body = "Body"
             };
 
-            var sender = new Sender<Message>("localhost", "message_queue");
+            var sender = new Producer<Message>("localhost", "message_queue");
             var token = (CancellationToken)startParam;
             var random = new Random(DateTime.Now.Millisecond);
             while (!token.IsCancellationRequested)

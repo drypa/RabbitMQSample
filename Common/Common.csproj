@@ -49,8 +49,8 @@
   <ItemGroup>
     <Compile Include="Message.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Receiver.cs" />
-    <Compile Include="Sender.cs" />
+    <Compile Include="Consumer.cs" />
+    <Compile Include="Producer.cs" />
     <Compile Include="Serializer.cs" />
   </ItemGroup>
   <ItemGroup>
