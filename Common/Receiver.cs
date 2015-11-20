@@ -10,7 +10,7 @@ namespace Common
         private readonly string HostName;
         private readonly Action<TMessage> messageReceivedAction;
         private readonly string queue;
-        private IModel channel;
+        private IModel model;
         private IConnection connection;
         private EventingBasicConsumer consumer;
 
@@ -25,44 +25,42 @@ namespace Common
         {
             var factory = new ConnectionFactory { HostName = HostName };
             connection = factory.CreateConnection();
-            channel = connection.CreateModel();
-            ConfigureChanel(channel);
+            model = connection.CreateModel();
+            ConfigureChanel(model);
 
-            consumer = new EventingBasicConsumer(channel);
-            consumer.Received += consumer_Received;
-            channel.BasicConsume(queue: queue,
-                                 noAck: false,
-                                 consumer: consumer);
+            consumer = new EventingBasicConsumer(model);
+
+            consumer.Received += (sender, args) => ItemProcessing(args);
+            model.BasicQos(0, 2, true);
+            model.BasicConsume(queue: queue, noAck: false, consumer: consumer);
+
         }
 
         public void Dispose()
         {
-            if (consumer != null)
-            {
-                consumer.Received -= consumer_Received;
-            }
             if (connection != null)
             {
                 connection.Dispose();
             }
-            if (channel != null)
+            if (model != null)
             {
-                channel.Dispose();
+                model.Dispose();
             }
         }
 
         private void ConfigureChanel(IModel chanel)
         {
-            chanel.QueueDeclare(queue: queue, durable: false, exclusive: false, autoDelete: false, arguments: null);
+
+            chanel.QueueDeclare(queue, true, false, autoDelete: false, arguments: null);
         }
 
-        private void consumer_Received(object sender, BasicDeliverEventArgs e)
+        private void ItemProcessing(BasicDeliverEventArgs e)
         {
             TMessage message = new Serializer<TMessage>().Desearalize(e.Body);
             messageReceivedAction(message);
-            if (channel != null)
+            if (model != null)
             {
-                channel.BasicAck(e.DeliveryTag, false);
+                model.BasicAck(e.DeliveryTag, false);
             }
         }
     }

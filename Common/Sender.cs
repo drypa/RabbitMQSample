@@ -3,7 +3,8 @@ using RabbitMQ.Client;
 
 namespace Common
 {
-    public class Sender<TMessage> where TMessage : new()
+    public class Sender<TMessage>
+        where TMessage : new()
     {
         private readonly string hostName;
         private readonly string queue;
@@ -20,20 +21,37 @@ namespace Common
             Send(message);
         }
 
+        private void ConfigureChanel(IModel chanel)
+        {
+            chanel.QueueDeclare(queue: queue, durable: true, exclusive: false, autoDelete: false, arguments: null);
+        }
+
         private void Send(byte[] message)
         {
             var factory = new ConnectionFactory { HostName = hostName };
-            using (var connection = factory.CreateConnection())
-            using (var chanel = connection.CreateModel())
+            using (IConnection connection = factory.CreateConnection())
             {
-                ConfigureChanel(chanel);
-                chanel.BasicPublish(exchange: string.Empty, routingKey: queue, basicProperties: null, body: message);
+                using (IModel channel = connection.CreateModel())
+                {
+                    ConfigureChanel(channel);
+                    IBasicProperties properties = channel.CreateBasicProperties();
+                    properties.DeliveryMode = DeliveryMode.Persistent;
+                    channel.BasicPublish(exchange: string.Empty, routingKey: queue, basicProperties: properties, body: message);
+                }
             }
         }
 
-        private void ConfigureChanel(IModel chanel)
+        private static class DeliveryMode
         {
-            chanel.QueueDeclare(queue: queue, durable: false, exclusive: false, autoDelete: false, arguments: null);
+            public static byte NonPersistent
+            {
+                get { return 1; }
+            }
+
+            public static byte Persistent
+            {
+                get { return 2; }
+            }
         }
     }
 }
