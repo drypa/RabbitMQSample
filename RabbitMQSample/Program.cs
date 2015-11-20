@@ -13,16 +13,18 @@ namespace RabbitMQSample
                 Counter = 100
             };
 
-            Sender<Message> sender = new Sender<Message>("localhost","message_queue");
+            Sender<Message> sender = new Sender<Message>("localhost", "message_queue");
             sender.Send(message);
+
+            using (Receiver<Message> receiver = new Receiver<Message>("localhost", "message_queue", (msg) => Console.WriteLine(msg.ToString())))
+            {
+                receiver.Open();
+                Console.ReadLine();
+            }
+
+
+            Console.ReadLine();
         }
 
-    }
-
-    public class Message
-    {
-        public string Title { get; set; }
-        public string Body { get; set; }
-        public int Counter { get; set; }
     }
 }

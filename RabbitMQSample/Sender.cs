@@ -1,24 +1,22 @@
 ﻿using System;
-using System.Text;
-using Newtonsoft.Json;
 using RabbitMQ.Client;
 
 namespace RabbitMQSample
 {
-    public class Sender<T>
+    public class Sender<TMessage> where TMessage : new()
     {
         private readonly string hostName;
-        private readonly string queueName;
+        private readonly string queue;
 
         public Sender(string serverName, string queueName)
         {
             hostName = serverName;
-            this.queueName = queueName;
+            queue = queueName;
         }
 
-        public void Send(T obj)
+        public void Send(TMessage obj)
         {
-            byte[] message = new Serializer<T>().Serialize(obj);
+            byte[] message = new Serializer<TMessage>().Serialize(obj);
             Send(message);
         }
 
@@ -29,28 +27,13 @@ namespace RabbitMQSample
             using (var chanel = connection.CreateModel())
             {
                 ConfigureChanel(chanel);
-                chanel.BasicPublish(exchange: string.Empty, routingKey: queueName, basicProperties: null, body: message);
+                chanel.BasicPublish(exchange: string.Empty, routingKey: queue, basicProperties: null, body: message);
             }
         }
 
         private void ConfigureChanel(IModel chanel)
         {
-            chanel.QueueDeclare(queue: queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
-        }
-    }
-
-    public class Serializer<T>
-    {
-        public T Desearalize(byte[] bytes)
-        {
-            string jsonString = Encoding.UTF8.GetString(bytes);
-            return JsonConvert.DeserializeObject<T>(jsonString);
-        }
-
-        public byte[] Serialize(T obj)
-        {
-            string jsonString = JsonConvert.SerializeObject(obj);
-            return Encoding.UTF8.GetBytes(jsonString);
+            chanel.QueueDeclare(queue: queue, durable: false, exclusive: false, autoDelete: false, arguments: null);
         }
     }
 }
