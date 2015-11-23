@@ -10,17 +10,19 @@ namespace Common
         private readonly string HostName;
         private readonly Action<TMessage> messageReceivedAction;
         private readonly string queue;
+        private readonly string routing;
         private readonly string exchange;
         private IModel model;
         private IConnection connection;
         private EventingBasicConsumer consumer;
 
-        public Consumer(string serverName, string queueName, string exchangeName, Action<TMessage> onMessageReceived)
+        public Consumer(string serverName, string queueName, string exchangeName, string routingKey, Action<TMessage> onMessageReceived)
         {
             HostName = serverName;
             queue = queueName;
             exchange = exchangeName;
             messageReceivedAction = onMessageReceived;
+            routing = routingKey;
         }
 
         public void Open()
@@ -31,20 +33,20 @@ namespace Common
 
             if (string.IsNullOrEmpty(exchange))
             {
-                model.QueueDeclare(queue, true, false, autoDelete: false, arguments: null);
+                model.QueueDeclare(queue, true, false, false, null);
             }
             else
             {
                 model.ExchangeDeclare(exchange, ExchangeType.Fanout);
                 var queueName = model.QueueDeclare().QueueName;
-                model.QueueBind(queueName, exchange, string.Empty);
+                model.QueueBind(queueName, exchange, routing);
             }
 
             consumer = new EventingBasicConsumer(model);
 
             consumer.Received += (sender, args) => ItemProcessing(args);
             model.BasicQos(0, 2, true);
-            model.BasicConsume(queue: queue, noAck: false, consumer: consumer);
+            model.BasicConsume(queue, false, consumer);
 
         }
 
@@ -52,11 +54,11 @@ namespace Common
         {
             if (connection != null)
             {
-                connection.Dispose();
+                connection.Close();
             }
             if (model != null)
             {
-                model.Dispose();
+                model.Close();
             }
         }
 

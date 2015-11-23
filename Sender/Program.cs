@@ -6,8 +6,10 @@ namespace Sender
 {
     internal class Program
     {
+        private static string routing;
         private static void Main(string[] args)
         {
+            routing = args.Length > 0 ? args[0] : "info";
             var source = new CancellationTokenSource();
 
             var sendThread = new Thread(Send);
@@ -35,7 +37,7 @@ namespace Sender
                 Body = "Body"
             };
 
-            using (var sender = new Producer<Message>("localhost", string.Empty, "add"))
+            using (var sender = new Producer<Message>("localhost", string.Empty, "add", routing))
             {
                 var token = (CancellationToken)startParam;
                 var random = new Random(DateTime.Now.Millisecond);
@@ -43,6 +45,7 @@ namespace Sender
                 {
                     message.Complexity = random.Next(10);
                     sender.Send(message);
+                    Thread.Sleep(1000);
                 }
             }
         }
