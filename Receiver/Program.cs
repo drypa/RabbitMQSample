@@ -8,7 +8,7 @@ namespace Receiver
     {
         static void Main(string[] args)
         {
-            using (var receiver = new Consumer<Message>("localhost", "message_queue", OnMessageReceived))
+            using (var receiver = new Consumer<Message>("localhost", string.Empty,"add", OnMessageReceived))
             {
                 receiver.Open();
 

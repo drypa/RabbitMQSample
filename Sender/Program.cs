@@ -35,13 +35,15 @@ namespace Sender
                 Body = "Body"
             };
 
-            var sender = new Producer<Message>("localhost", "message_queue");
-            var token = (CancellationToken)startParam;
-            var random = new Random(DateTime.Now.Millisecond);
-            while (!token.IsCancellationRequested)
+            using (var sender = new Producer<Message>("localhost", string.Empty, "add"))
             {
-                message.Complexity = random.Next(10);
-                sender.Send(message);
+                var token = (CancellationToken)startParam;
+                var random = new Random(DateTime.Now.Millisecond);
+                while (!token.IsCancellationRequested)
+                {
+                    message.Complexity = random.Next(10);
+                    sender.Send(message);
+                }
             }
         }
     }

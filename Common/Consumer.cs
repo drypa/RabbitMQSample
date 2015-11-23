@@ -10,14 +10,16 @@ namespace Common
         private readonly string HostName;
         private readonly Action<TMessage> messageReceivedAction;
         private readonly string queue;
+        private readonly string exchange;
         private IModel model;
         private IConnection connection;
         private EventingBasicConsumer consumer;
 
-        public Consumer(string serverName, string queueName, Action<TMessage> onMessageReceived)
+        public Consumer(string serverName, string queueName, string exchangeName, Action<TMessage> onMessageReceived)
         {
             HostName = serverName;
             queue = queueName;
+            exchange = exchangeName;
             messageReceivedAction = onMessageReceived;
         }
 
@@ -26,12 +28,22 @@ namespace Common
             var factory = new ConnectionFactory { HostName = HostName };
             connection = factory.CreateConnection();
             model = connection.CreateModel();
-            ConfigureChanel(model);
+
+            if (string.IsNullOrEmpty(exchange))
+            {
+                model.QueueDeclare(queue, true, false, autoDelete: false, arguments: null);
+            }
+            else
+            {
+                model.ExchangeDeclare(exchange, ExchangeType.Fanout);
+                var queueName = model.QueueDeclare().QueueName;
+                model.QueueBind(queueName, exchange, string.Empty);
+            }
 
             consumer = new EventingBasicConsumer(model);
-            
-            consumer.Received+= (sender, args) => ItemProcessing(args);
-            model.BasicQos(0,2,true);
+
+            consumer.Received += (sender, args) => ItemProcessing(args);
+            model.BasicQos(0, 2, true);
             model.BasicConsume(queue: queue, noAck: false, consumer: consumer);
 
         }
@@ -48,11 +60,6 @@ namespace Common
             }
         }
 
-        private void ConfigureChanel(IModel chanel)
-        {
-            
-            chanel.QueueDeclare(queue,  true, false, autoDelete: false, arguments: null);
-        }
 
         private void ItemProcessing(BasicDeliverEventArgs e)
         {
